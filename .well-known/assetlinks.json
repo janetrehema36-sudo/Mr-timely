@@ -2,7 +2,7 @@
       "relation": ["delegate_permission/common.handle_all_urls"],
       "target": {
         "namespace": "android_app",
-        "package_name": "io.github.janetrehema36_sudo.twa",
-        "sha256_cert_fingerprints": ["8D:71:43:8B:1C:B8:75:20:3E:C0:FE:EA:F8:B6:AE:1F:5B:D5:24:2A:1A:72:E9:20:8C:66:67:40:90:8B:BD:8F"]
+        "package_name": "app.vercel.mr_timely.twa",
+        "sha256_cert_fingerprints": ["3C:CF:3D:0D:AD:33:15:CA:BF:9A:F7:70:D2:52:2A:5C:F5:7F:55:13:3B:9F:3A:54:6E:59:22:F4:55:20:A9:8D"]
       }
     }]
