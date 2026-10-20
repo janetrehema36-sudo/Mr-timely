@@ -1,8 +1,8 @@
 {
   "name": "Ms Timely",
   "short_name": "Ms Timely",
-  "start_url": "https://janetrehema36-sudo.github.io/Ms-timely/",
-  "scope": "https://janetrehema36-sudo.github.io/Ms-timely/",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#0f172a",
@@ -10,13 +10,13 @@
   "description": "A clean and modern time management app featuring custom time tracking and timers.",
   "icons": [
     {
-      "src": "https://janetrehema36-sudo.github.io/Ms-timely/manifest.json.jpg",
+      "src": "https://via.placeholder.com/192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://janetrehema36-sudo.github.io/Ms-timely/manifest.json.jpg",
+      "src": "https://via.placeholder.com/512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
