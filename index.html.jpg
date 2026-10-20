@@ -1,0 +1,359 @@
+<!DOCTYPE html><html lang="en"><head><meta name="x-poe-datastore-behavior" content="local_only"><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Time App</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --accent: #38bdf8;
+      --accent-hover: #0284c7;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --danger: #ef4444;
+      --border: rgba(255, 255, 255, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #1e293b, var(--bg));
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+    }
+
+    .container {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 2rem;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active {
+      background: var(--accent);
+      color: #0f172a;
+    }
+
+    /* Panels */
+    .panel {
+      display: none;
+      text-align: center;
+      animation: fadeIn 0.25s ease-in-out;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Displays */
+    .display {
+      font-variant-numeric: tabular-nums;
+      font-size: 3.5rem;
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin: 1rem 0;
+      color: var(--text-main);
+    }
+
+    .sub-display {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 1.5rem;
+    }
+
+    button.btn {
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .btn-primary { background: var(--accent); color: #0f172a; }
+    .btn-primary:hover { background: var(--accent-hover); }
+
+    .btn-secondary { background: rgba(255, 255, 255, 0.08); color: var(--text-main); }
+    .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+    .btn-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
+
+    /* Inputs for Timer */
+    .timer-inputs {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin: 1.5rem 0;
+    }
+
+    .timer-inputs input {
+      width: 70px;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(0, 0, 0, 0.2);
+      color: var(--text-main);
+      font-size: 1.25rem;
+      text-align: center;
+      outline: none;
+    }
+
+    .timer-inputs input:focus { border-color: var(--accent); }
+
+    /* Lap List */
+    .lap-list {
+      margin-top: 1.5rem;
+      max-height: 140px;
+      overflow-y: auto;
+      border-top: 1px solid var(--border);
+      padding-top: 10px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .lap-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Tabs Navigation -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('clock')">Clock</button>
+      <button class="tab-btn" onclick="switchTab('stopwatch')">Stopwatch</button>
+      <button class="tab-btn" onclick="switchTab('timer')">Timer</button>
+    </div>
+
+    <!-- 1. Live Clock -->
+    <div id="clock" class="panel active">
+      <div class="display" id="clock-time">00:00:00</div>
+      <div class="sub-display" id="clock-date">Loading date...</div>
+      <button class="btn btn-secondary" id="format-toggle" onclick="toggleClockFormat()">Switch to 12-hour</button>
+    </div>
+
+    <!-- 2. Stopwatch -->
+    <div id="stopwatch" class="panel">
+      <div class="display" id="sw-time">00:00.00</div>
+      <div class="controls">
+        <button class="btn btn-primary" id="sw-start-btn" onclick="toggleStopwatch()">Start</button>
+        <button class="btn btn-secondary" onclick="recordLap()">Lap</button>
+        <button class="btn btn-danger" onclick="resetStopwatch()">Reset</button>
+      </div>
+      <div class="lap-list" id="sw-laps"></div>
+    </div>
+
+    <!-- 3. Countdown Timer -->
+    <div id="timer" class="panel">
+      <div class="display" id="timer-display">00:00:00</div>
+      
+      <div class="timer-inputs" id="timer-controls-input">
+        <input type="number" id="t-hours" min="0" max="99" placeholder="HH" value="00">
+        <input type="number" id="t-mins" min="0" max="59" placeholder="MM" value="05">
+        <input type="number" id="t-secs" min="0" max="59" placeholder="SS" value="00">
+      </div>
+
+      <div class="controls">
+        <button class="btn btn-primary" id="timer-start-btn" onclick="toggleTimer()">Start</button>
+        <button class="btn btn-danger" onclick="resetTimer()">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Tab Switching
+    function switchTab(tabId) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    // --- 1. CLOCK LOGIC ---
+    let is24Hour = true;
+    function updateClock() {
+      const now = new Date();
+      const options = { hour12: !is24Hour, hour: '2-digit', minute: '2-digit', second: '2-digit' };
+      document.getElementById('clock-time').textContent = now.toLocaleTimeString([], options);
+      
+      const dateOptions = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
+      document.getElementById('clock-date').textContent = now.toLocaleDateString(undefined, dateOptions);
+    }
+    function toggleClockFormat() {
+      is24Hour = !is24Hour;
+      document.getElementById('format-toggle').textContent = is24Hour ? 'Switch to 12-hour' : 'Switch to 24-hour';
+      updateClock();
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // --- 2. STOPWATCH LOGIC (Timestamp delta based to prevent drift) ---
+    let swStartTime = 0;
+    let swElapsedTime = 0;
+    let swInterval = null;
+    let lapCount = 1;
+
+    function formatStopwatch(ms) {
+      const minutes = String(Math.floor(ms / 60000)).padStart(2, '0');
+      const seconds = String(Math.floor((ms % 60000) / 1000)).padStart(2, '0');
+      const hundredths = String(Math.floor((ms % 1000) / 10)).padStart(2, '0');
+      return `${minutes}:${seconds}.${hundredths}`;
+    }
+
+    function toggleStopwatch() {
+      const btn = document.getElementById('sw-start-btn');
+      if (!swInterval) {
+        swStartTime = Date.now() - swElapsedTime;
+        swInterval = setInterval(() => {
+          swElapsedTime = Date.now() - swStartTime;
+          document.getElementById('sw-time').textContent = formatStopwatch(swElapsedTime);
+        }, 10);
+        btn.textContent = 'Pause';
+        btn.classList.add('btn-secondary');
+      } else {
+        clearInterval(swInterval);
+        swInterval = null;
+        btn.textContent = 'Resume';
+        btn.classList.remove('btn-secondary');
+      }
+    }
+
+    function recordLap() {
+      if (swElapsedTime === 0) return;
+      const lapList = document.getElementById('sw-laps');
+      const item = document.createElement('div');
+      item.className = 'lap-item';
+      item.innerHTML = `<span>Lap ${lapCount++}</span><span>${formatStopwatch(swElapsedTime)}</span>`;
+      lapList.prepend(item);
+    }
+
+    function resetStopwatch() {
+      clearInterval(swInterval);
+      swInterval = null;
+      swElapsedTime = 0;
+      lapCount = 1;
+      document.getElementById('sw-time').textContent = '00:00.00';
+      document.getElementById('sw-start-btn').textContent = 'Start';
+      document.getElementById('sw-laps').innerHTML = '';
+    }
+
+    // --- 3. COUNTDOWN TIMER LOGIC ---
+    let timerTotalSeconds = 0;
+    let timerRemainingSeconds = 0;
+    let timerInterval = null;
+
+    function formatTimer(totalSecs) {
+      const h = String(Math.floor(totalSecs / 3600)).padStart(2, '0');
+      const m = String(Math.floor((totalSecs % 3600) / 60)).padStart(2, '0');
+      const s = String(totalSecs % 60).padStart(2, '0');
+      return `${h}:${m}:${s}`;
+    }
+
+    function playBeep() {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(800, ctx.currentTime);
+      osc.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.5);
+    }
+
+    function toggleTimer() {
+      const btn = document.getElementById('timer-start-btn');
+      if (!timerInterval) {
+        if (timerRemainingSeconds <= 0) {
+          const h = parseInt(document.getElementById('t-hours').value) || 0;
+          const m = parseInt(document.getElementById('t-mins').value) || 0;
+          const s = parseInt(document.getElementById('t-secs').value) || 0;
+          timerTotalSeconds = (h * 3600) + (m * 60) + s;
+          timerRemainingSeconds = timerTotalSeconds;
+        }
+
+        if (timerRemainingSeconds <= 0) return;
+
+        timerInterval = setInterval(() => {
+          timerRemainingSeconds--;
+          document.getElementById('timer-display').textContent = formatTimer(timerRemainingSeconds);
+
+          if (timerRemainingSeconds <= 0) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            btn.textContent = 'Start';
+            playBeep();
+            alert('Timer finished!');
+          }
+        }, 1000);
+
+        document.getElementById('timer-display').textContent = formatTimer(timerRemainingSeconds);
+        btn.textContent = 'Pause';
+      } else {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        btn.textContent = 'Resume';
+      }
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      timerRemainingSeconds = 0;
+      document.getElementById('timer-display').textContent = '00:00:00';
+      document.getElementById('timer-start-btn').textContent = 'Start';
+    }
+  </script>
+
+
+</body></html>
