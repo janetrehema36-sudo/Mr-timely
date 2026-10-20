@@ -1,6 +1,6 @@
 {
-  "name": "Ms Timely",
-  "short_name": "Ms Timely",
+  "name": "Mr Timely",
+  "short_name": "Mr Timely",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
