@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "io.github.janetrehema36_sudo.twa",
+      "sha256_cert_fingerprints": [
+        "1D:F4:DF:BB:2E:BD:24:D7:93:37:A6:61:D1:ED:A6:66:E8:EE:18:7E:59:7A:B4:79:BF:7D:96:5D:87:B2:D6:AC"
+      ]
+    }
+  }
+]
