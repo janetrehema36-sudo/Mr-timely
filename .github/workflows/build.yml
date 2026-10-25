@@ -27,11 +27,11 @@ jobs:
     - name: Install Cordova
       run: npm install -g cordova
 
-    - name: Initialize Cordova Project
+    - name: Install Dependencies
+      run: npm install || true
+
+    - name: Add Android Platform & Build
       run: |
-        cordova create app_build com.timely.app MrTimely
-        cd app_build
-        cp -r ../* www/ 2>/dev/null || true
         cordova platform add android
         cordova build android --debug
 
@@ -39,4 +39,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: MrTimely-APK
-        path: app_build/platforms/android/app/build/outputs/apk/debug/*.apk
+        path: platforms/android/app/build/outputs/apk/debug/*.apk
