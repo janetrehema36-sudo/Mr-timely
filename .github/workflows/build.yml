@@ -3,11 +3,16 @@ name: Build Android APK
 on:
   push:
     branches: [ main, master ]
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
 
     steps:
     - name: Checkout Repository
@@ -27,15 +32,23 @@ jobs:
     - name: Install Cordova
       run: npm install -g cordova
 
-    - name: Build Cordova Project from Web Assets
+    - name: Build Cordova Project & Inject Custom Icon
       run: |
         cordova create myapp com.timely.app MrTimely
         cd myapp
-        # Copy all root repository files (except workflows and hidden folders) into www
         rm -rf www/*
         cp -r ../* www/ 2>/dev/null || true
         rm -rf www/myapp www/.git www/.github
+        
         cordova platform add android
+        
+        # Automatically replace default launcher icons with thrag_square.png
+        if [ -f "www/thrag_square.png" ]; then
+          find platforms/android/app/src/main/res -name "ic_launcher*.png" | while read file; do
+            cp www/thrag_square.png "$file"
+          done
+        fi
+        
         cordova build android --debug
 
     - name: Upload APK Artifact
@@ -43,3 +56,9 @@ jobs:
       with:
         name: MrTimely-APK
         path: myapp/platforms/android/app/build/outputs/apk/debug/*.apk
+
+    - name: Upload APK to Release
+      uses: softprops/action-gh-release@v2
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: myapp/platforms/android/app/build/outputs/apk/debug/*.apk
